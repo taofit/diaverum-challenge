@@ -1,33 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
-const API_PATH = 'http://localhost/diaverum_challenge/API/index.php';
-
-// const onSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     console.log('on submit');
-// }
-
+import DataList from './dataList';
+import { fields, ItemType } from './types';
 
 const FileProcess = () => {
     const fileReader = new FileReader();
     const [currentFile, setCurrentFile] = useState<File>(null);
-    const [content, setContent] = useState([]);
+    const [ content, setContent ] = useState<ItemType[]|{}[]>([]);
     const handleFileRead = (e) => {
-        // setContent(fileReader.result);
-        //
-        // console.log(content);
-        // // … do something with the 'content' …
-        //onload function which reads file data and do task
         let fileContent = e.target.result;
         const allLines = fileContent.split(/\r\n|\n/);
-        const finalLines = allLines.filter(line => line.lastIndexOf('#') === -1 ? true : false);
+        const finalLines = allLines.filter(line => line.lastIndexOf('#', 0) === -1 ? true : false);
+        finalLines.shift();
         const fileData = [];
         finalLines.forEach(line => {
             fileData.push(line.split('|'));
         });
-        setContent([...content, fileData ]);
-        console.log(content);
+        let fileDataList: ItemType[]|{}[];
+        fileDataList = fileData.map(item => {
+            let fileObject:ItemType|{} = {};
+            fields.forEach((key, idx) => fileObject[key] = item[idx]);
+
+            return fileObject;
+        });
+        setContent([...content, ...fileDataList]);
     };
 
 
@@ -56,7 +51,7 @@ const FileProcess = () => {
             >
                 Upload
             </button>
-            {content}
+            <DataList content={content} />
         </div>
     );
 }
