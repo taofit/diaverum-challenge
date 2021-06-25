@@ -1,15 +1,93 @@
 import React, { useState } from "react";
 import { useTable, useFilters, useGlobalFilter, useAsyncDebounce } from "react-table";
+import {matchSorter} from 'match-sorter';
+
+// Define a default UI for filtering
+function GlobalFilter({
+                          preGlobalFilteredRows,
+                          globalFilter,
+                          setGlobalFilter,
+                      }) {
+    const count = preGlobalFilteredRows.length
+    const [value, setValue] = React.useState(globalFilter)
+    const onChange = useAsyncDebounce(value => {
+        setGlobalFilter(value || undefined)
+    }, 200)
+
+    return (
+        <span>
+      Search:{' '}
+            <input
+                value={value || ""}
+                onChange={e => {
+                    setValue(e.target.value);
+                    onChange(e.target.value);
+                }}
+                placeholder={`${count} records...`}
+                style={{
+                    fontSize: '1.1rem',
+                    border: '0',
+                }}
+            />
+    </span>
+    )
+}
+
+// Define a default UI for filtering
+const DefaultColumnFilter = ({
+                                 column: {filterValue, preFilteredRows, setFilter},
+                             }) => {
+    const count = preFilteredRows.length
+
+    return (
+        <input
+            value={filterValue || ''}
+            onChange={e => {
+                setFilter(e.target.value || undefined) // Set undefined to remove the filter entirely
+            }}
+            placeholder={`Search ${count} records...`}
+        />
+    )
+}
+
+const fuzzyTextFilterFn = (rows, id, filterValue) => {
+    return matchSorter(rows, filterValue, { keys: [row => row[id]] })
+}
+
+// Let the table remove the filter if the string is empty
+fuzzyTextFilterFn.autoRemove = val => !val
 
 const DataTable = ({ columns, data }) => {
     // console.log(columns, data);
-    const [filterInput, setFilterInput] = useState("");
+    // const [filterInput, setFilterInput] = useState("");
 
-    const handleFilterChange = e => {
-        const value = e.target.value || undefined;
-        setFilter(value); // Update the BARCODE filter. Now our table will filter and show only the rows which have a matching value
-        setFilterInput(value);
-    };
+    const filterTypes = React.useMemo(
+        () => ({
+            // Add a new fuzzyTextFilterFn filter type.
+            fuzzyText: fuzzyTextFilterFn,
+            // Or, override the default text filter to use
+            // "startWith"
+            text: (rows, id, filterValue) => {
+                return rows.filter(row => {
+                    const rowValue = row.values[id]
+                    return rowValue !== undefined
+                        ? String(rowValue)
+                            .toLowerCase()
+                            .startsWith(String(filterValue).toLowerCase())
+                        : true
+                })
+            },
+        }),
+        []
+    )
+
+    const defaultColumn = React.useMemo(
+        () => ({
+            // Let's set up our default Filter UI
+            Filter: DefaultColumnFilter,
+        }),
+        []
+    )
 
     const {
         getTableProps,
@@ -17,16 +95,14 @@ const DataTable = ({ columns, data }) => {
         headerGroups,
         rows,
         prepareRow,
-        setFilter,
-    } = useTable({ columns, data }, useFilters)
+        state,
+        visibleColumns,
+        preGlobalFilteredRows,
+        setGlobalFilter,
+    } = useTable({ columns, data, defaultColumn, filterTypes }, useFilters, useGlobalFilter)
 
     return (
         <>
-            <input
-                value={filterInput}
-                onChange={handleFilterChange}
-                placeholder={"Search"}
-            />
             <table {...getTableProps()} style={{ border: 'solid 1px blue' }}>
                 <thead>
                 {headerGroups.map(headerGroup => (
@@ -42,10 +118,25 @@ const DataTable = ({ columns, data }) => {
                                 }}
                             >
                                 {column.render('Header')}
+                                <div>{column.canFilter ? column.render('Filter') : null}</div>
                             </th>
                         ))}
                     </tr>
                 ))}
+                <tr>
+                    <th
+                        colSpan={visibleColumns.length}
+                        style={{
+                            textAlign: 'left',
+                        }}
+                    >
+                        <GlobalFilter
+                            preGlobalFilteredRows={preGlobalFilteredRows}
+                            globalFilter={state.globalFilter}
+                            setGlobalFilter={setGlobalFilter}
+                        />
+                    </th>
+                </tr>
                 </thead>
                 <tbody {...getTableBodyProps()}>
                 {rows.map(row => {
@@ -71,6 +162,8 @@ const DataTable = ({ columns, data }) => {
                 })}
                 </tbody>
             </table>
+            <br />
+            <div>Showing the first 20 results of {rows.length} rows</div>
         </>
     )
 }
