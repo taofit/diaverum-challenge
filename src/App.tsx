@@ -1,5 +1,5 @@
 import React from 'react';
-import Form from './form';
+import FileProcess from './fileProcess';
 
 function App() {
   return (
@@ -9,7 +9,7 @@ function App() {
           Please upload a file.
         </p>
       </header>
-      <Form />
+      <FileProcess />
     </div>
   );
 }
