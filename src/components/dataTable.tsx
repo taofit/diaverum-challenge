@@ -59,9 +59,6 @@ const fuzzyTextFilterFn = (rows, id, filterValue) => {
 fuzzyTextFilterFn.autoRemove = val => !val
 
 const DataTable = ({ columns, data }) => {
-    // console.log(columns, data);
-    // const [filterInput, setFilterInput] = useState("");
-
     const filterTypes = React.useMemo(
         () => ({
             // Add a new fuzzyTextFilterFn filter type.
@@ -204,8 +201,6 @@ const DataTable = ({ columns, data }) => {
                     ))}
                 </select>
             </div>
-            {/*<br />*/}
-            {/*<div>Showing the first 20 results of {rows.length} rows</div>*/}
         </>
     )
 }

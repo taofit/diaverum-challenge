@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DataList from './dataList';
 import { fields, ItemType } from '../types';
 import { FileProcessWrapper, Instruction } from '../app.styles';
 
 const FileProcess = () => {
-    const fileReader = new FileReader();
+    const [fileReader, setFileReader] = useState<FileReader>();
     const [currentFile, setCurrentFile] = useState<File>(null);
     const [ content, setContent ] = useState<ItemType[]|{}[]>([]);
     const handleFileRead = (e) => {
-        let fileContent = e.target.result;
+        const fileContent = e.target.result;
         const allLines = fileContent.split(/\r\n|\n/);
         const finalLines = allLines.filter(line => line.lastIndexOf('#', 0) === -1 ? true : false);
         finalLines.shift();
@@ -26,6 +26,7 @@ const FileProcess = () => {
         setContent([...content, ...fileDataList]);
     };
 
+    useEffect(() => setFileReader(new FileReader()), []);
 
     const selectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -37,7 +38,6 @@ const FileProcess = () => {
     const onSubmit = () => {
         fileReader.readAsText(currentFile);
         fileReader.onloadend = handleFileRead;
-
     }
 
     return (

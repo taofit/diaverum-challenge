@@ -4,10 +4,8 @@ import { fields } from '../types';
 import { LabResult, TableWrapper } from '../app.styles';
 
 const DataList = ({content}) => {
-    const columnsFields = fields.map(field => ({Header: field.replace("_", " "), accessor: field}));
-
     const columns = useMemo(
-        () => columnsFields,
+        () => fields.map(field => ({Header: field.replace("_", " "), accessor: field})),
         []
     );
 
@@ -19,7 +17,6 @@ const DataList = ({content}) => {
                     <DataTable columns={columns} data={content} />
                 </TableWrapper>
             }
-
         </>
     );
 }
