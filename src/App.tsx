@@ -1,16 +1,20 @@
 import React from 'react';
-import FileProcess from './fileProcess';
+import FileProcess from './components/fileProcess';
+import logoUrl from './assets/diaverum-logo-primary.svg';
+import { Header, GlobalWrapper, GlobalStyle } from './app.styles';
+import LocalHospital from '@material-ui/icons/LocalHospital';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Please upload a file.
-        </p>
-      </header>
+    <GlobalWrapper>
+      <GlobalStyle />
+      <Header>
+          <img src={logoUrl} alt="Tesla" />
+          <h1>Patients test results</h1>
+          <LocalHospital />
+      </Header>
       <FileProcess />
-    </div>
+    </GlobalWrapper>
   );
 }
 

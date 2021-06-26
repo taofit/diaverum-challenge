@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import DataList from './dataList';
-import { fields, ItemType } from './types';
+import { fields, ItemType } from '../types';
+import { FileProcessWrapper, Instruction } from '../app.styles';
 
 const FileProcess = () => {
     const fileReader = new FileReader();
@@ -40,7 +41,8 @@ const FileProcess = () => {
     }
 
     return (
-        <div>
+        <FileProcessWrapper>
+            <Instruction>Please upload a file.</Instruction>
             <label className='btn'>
                 <input type='file' onChange={selectFile} />
             </label>
@@ -52,7 +54,7 @@ const FileProcess = () => {
                 Upload
             </button>
             <DataList content={content} />
-        </div>
+        </FileProcessWrapper>
     );
 }
 

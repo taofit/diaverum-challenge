@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useTable, useFilters, useGlobalFilter, useAsyncDebounce } from "react-table";
+import { useTable, useFilters, useGlobalFilter, useAsyncDebounce, usePagination } from "react-table";
 import {matchSorter} from 'match-sorter';
 
 // Define a default UI for filtering
@@ -150,7 +150,7 @@ const DataTable = ({ columns, data }) => {
                                         style={{
                                             padding: '10px',
                                             border: 'solid 1px gray',
-                                            background: 'papayawhip',
+                                            background: '#f5e7ef',
                                         }}
                                     >
                                         {cell.render('Cell')}
