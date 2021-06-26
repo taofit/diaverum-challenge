@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { useTable, useFilters, useGlobalFilter, useAsyncDebounce, usePagination } from "react-table";
+import React from 'react';
+import { useTable, useFilters, useGlobalFilter, useAsyncDebounce, usePagination } from 'react-table';
 import {matchSorter} from 'match-sorter';
+import { Table } from '../app.styles';
 
 // Define a default UI for filtering
 function GlobalFilter({
@@ -93,29 +94,31 @@ const DataTable = ({ columns, data }) => {
         getTableProps,
         getTableBodyProps,
         headerGroups,
-        rows,
         prepareRow,
-        state,
         visibleColumns,
         preGlobalFilteredRows,
         setGlobalFilter,
-    } = useTable({ columns, data, defaultColumn, filterTypes }, useFilters, useGlobalFilter)
+        page,
+        canPreviousPage,
+        canNextPage,
+        pageOptions,
+        pageCount,
+        gotoPage,
+        nextPage,
+        previousPage,
+        setPageSize,
+        state: { pageIndex, pageSize, globalFilter }
+    } = useTable({ columns, data, defaultColumn, filterTypes, initialState: { pageIndex: 0 } }, useFilters, useGlobalFilter, usePagination)
 
     return (
         <>
-            <table {...getTableProps()} style={{ border: 'solid 1px blue' }}>
+            <Table {...getTableProps()}>
                 <thead>
                 {headerGroups.map(headerGroup => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map(column => (
                             <th
                                 {...column.getHeaderProps()}
-                                style={{
-                                    borderBottom: 'solid 3px red',
-                                    background: 'aliceblue',
-                                    color: 'black',
-                                    fontWeight: 'bold',
-                                }}
                             >
                                 {column.render('Header')}
                                 <div>{column.canFilter ? column.render('Filter') : null}</div>
@@ -132,14 +135,14 @@ const DataTable = ({ columns, data }) => {
                     >
                         <GlobalFilter
                             preGlobalFilteredRows={preGlobalFilteredRows}
-                            globalFilter={state.globalFilter}
+                            globalFilter={globalFilter}
                             setGlobalFilter={setGlobalFilter}
                         />
                     </th>
                 </tr>
                 </thead>
                 <tbody {...getTableBodyProps()}>
-                {rows.map(row => {
+                {page.map(row => {
                     prepareRow(row)
                     return (
                         <tr {...row.getRowProps()}>
@@ -147,11 +150,6 @@ const DataTable = ({ columns, data }) => {
                                 return (
                                     <td
                                         {...cell.getCellProps()}
-                                        style={{
-                                            padding: '10px',
-                                            border: 'solid 1px gray',
-                                            background: '#f5e7ef',
-                                        }}
                                     >
                                         {cell.render('Cell')}
                                     </td>
@@ -161,9 +159,53 @@ const DataTable = ({ columns, data }) => {
                     )
                 })}
                 </tbody>
-            </table>
-            <br />
-            <div>Showing the first 20 results of {rows.length} rows</div>
+            </Table>
+            <div>
+                <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+                    {"<<"}
+                </button>{" "}
+                <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+                    {"<"}
+                </button>{" "}
+                <button onClick={() => nextPage()} disabled={!canNextPage}>
+                    {">"}
+                </button>{" "}
+                <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+                    {">>"}
+                </button>{" "}
+                <span>
+                    Page{" "}
+                    <strong>
+                      {pageIndex + 1} of {pageOptions.length}
+                    </strong>{" "}
+                </span>
+                <span>
+                    | Go to page:{" "}
+                    <input
+                        type="number"
+                        defaultValue={pageIndex + 1}
+                        onChange={e => {
+                            const page = e.target.value ? Number(e.target.value) - 1 : 0;
+                            gotoPage(page);
+                        }}
+                        style={{ width: "100px" }}
+                    />
+                </span>{" "}
+                <select
+                    value={pageSize}
+                    onChange={e => {
+                        setPageSize(Number(e.target.value));
+                    }}
+                >
+                    {[10, 20, 30, 40, 50].map(pageSize => (
+                        <option key={pageSize} value={pageSize}>
+                            Show {pageSize}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            {/*<br />*/}
+            {/*<div>Showing the first 20 results of {rows.length} rows</div>*/}
         </>
     )
 }

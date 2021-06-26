@@ -1,4 +1,4 @@
-import styled, { createGlobalStyle } from "styled-components";
+import styled, { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyle = createGlobalStyle`
   body {
@@ -43,4 +43,27 @@ export const Instruction = styled.p`
 
 export const LabResult = styled.h2`
     color:#1c5334;
-`
+`;
+export const TableWrapper = styled.div`
+    box-shadow: 0 0 6px #ffebe0;
+    border-radius: 6px;
+    padding: 14px;
+`;
+
+export const Table = styled.table`
+    overflow-x: auto;
+    display: block;
+    border-collapse: collapse;
+  
+  thead th {
+    background: aliceblue;
+    color: black;
+    font-weight: bold;
+    padding: 5px 0;
+  }
+  tbody td {
+    padding: 10px;
+    border: solid 1px #b99a9a;
+    background: #f5e7ef;
+  }
+`;

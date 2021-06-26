@@ -42,7 +42,7 @@ const FileProcess = () => {
 
     return (
         <FileProcessWrapper>
-            <Instruction>Please upload a file.</Instruction>
+            <Instruction>Please upload patient test result file.</Instruction>
             <label className='btn'>
                 <input type='file' onChange={selectFile} />
             </label>
