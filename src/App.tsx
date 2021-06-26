@@ -9,7 +9,7 @@ function App() {
     <GlobalWrapper>
       <GlobalStyle />
       <Header>
-          <img src={logoUrl} alt="Tesla" />
+          <img src={logoUrl} alt="diaverum-logo" />
           <h1>Patients test results</h1>
           <LocalHospital />
       </Header>
